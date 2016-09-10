@@ -1,5 +1,5 @@
 /**
- * AgendaDaySkin.java
+ * AgendaSkinTimeScale24HourAbstract.java
  *
  * Copyright (c) 2011-2016, JFXtras
  * All rights reserved.
@@ -27,40 +27,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package jfxtras.internal.scene.control.skin.agenda;
+package jfxtras.internal.scene.control.skin.agenda.base24hour;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import jfxtras.internal.scene.control.skin.agenda.base24hour.AgendaSkinTimeScale24HourAbstract;
 import jfxtras.scene.control.agenda.Agenda;
 
-/**
- * @author Tom Eugelink
- */
-public class AgendaDaySkin extends AgendaSkinTimeScale24HourAbstract<AgendaDaySkin> {
-	
-	/**
-	 * 
-	 */
-	public AgendaDaySkin(Agenda control) {
+ public  abstract class AgendaSkinTimeScaleWorkDayAbstract<T> extends AgendaSkinTimeScale24HourAbstract<T>
+{
+	public AgendaSkinTimeScaleWorkDayAbstract(Agenda control){
 		super(control);
 	}
 
-	
-	/**
-	 * Assign a calendar to each day, so it knows what it must draw.
-	 */
-	protected List<LocalDate> determineDisplayedLocalDates()
-	{
-		// the result 
-		List<LocalDate> lLocalDates = new ArrayList<>();
-		
-		// only the display date
-		lLocalDates.add(control.getDisplayedLocalDateTime().toLocalDate());
-		
-		// done
-		return lLocalDates;
+	@Override
+	public int getStartHour() {
+		return 8;
+	}
+
+	@Override
+	public int getEndHour() {
+		return 20;
 	}
 }

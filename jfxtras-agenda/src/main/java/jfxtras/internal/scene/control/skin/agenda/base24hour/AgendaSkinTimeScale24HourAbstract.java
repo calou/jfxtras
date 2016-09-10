@@ -90,20 +90,23 @@ implements AgendaSkin
 	/**
 	 * 
 	 */
-	public AgendaSkinTimeScale24HourAbstract(Agenda control)
+    public AgendaSkinTimeScale24HourAbstract(Agenda control)
 	{
-		super(control);
+        super(control);
 		this.control = control;
 		construct();
 	}
 	protected final Agenda control;
 
-	public void setHourBoundaries(int startHour, int endHour) {
-		this.startHour = startHour;
-		reconstruct();
-	}
+    public int getStartHour() {
+        return startHour;
+    }
 
-	/**
+    public int getEndHour() {
+        return endHour;
+    }
+
+    /**
 	 * Reconstruct the UI part
 	 */
 	protected void reconstruct() {
@@ -383,11 +386,11 @@ implements AgendaSkin
 	private void scrollWeekpaneToShowDisplayedTime() {
 		// calculate the offset of the displayed time from midnight
 		LocalDateTime lDisplayedLocalDateTime = getSkinnable().displayedLocalDateTime().get();
-		double lOffsetInMinutes = ((lDisplayedLocalDateTime.getHour()-startHour) * 60) + lDisplayedLocalDateTime.getMinute();
+		double lOffsetInMinutes = ((lDisplayedLocalDateTime.getHour()-getStartHour()) * 60) + lDisplayedLocalDateTime.getMinute();
 		
 		// calculate the position of the scrollbar that matches that offset from midnight
 		double lScrollRange = weekScrollPane.getVmax() - weekScrollPane.getVmin();
-		double lValue = lScrollRange * lOffsetInMinutes / ((endHour-startHour) * 60.0);
+		double lValue = lScrollRange * lOffsetInMinutes / ((getEndHour()-getStartHour()) * 60.0);
 		weekScrollPane.setVvalue(lValue);
 	}
 	
@@ -448,7 +451,7 @@ implements AgendaSkin
 		}
 		
 		private void construct() {
-			getChildren().add(new TimeScale24Hour(this, layoutHelp, startHour, endHour));
+			getChildren().add(new TimeScale24Hour(this, layoutHelp, getStartHour(), getEndHour()));
 			
 			int i = 0;
 			for (LocalDate localDate : determineDisplayedLocalDates())
@@ -459,8 +462,8 @@ implements AgendaSkin
 				lDayPane.prefWidthProperty().bind(layoutHelp.dayWidthProperty);
 				lDayPane.prefHeightProperty().bind(layoutHelp.dayHeightProperty);
 				getChildren().add(lDayPane);
-				lDayPane.setStartHour(startHour);
-				lDayPane.setEndHour(endHour);
+				lDayPane.setStartHour(getStartHour());
+				lDayPane.setEndHour(getEndHour());
 				// remember
 				dayBodyPanes.add(lDayPane);
 				localDate = localDate.plusDays(1);
@@ -523,8 +526,8 @@ implements AgendaSkin
 					}
 
 					// place it
-					int lOffsetY = ((lNow.getHour()-startHour) * 60) + lNow.getMinute();
-					nowLine.setY(NodeUtil.snapXY(layoutHelp.dayHeightProperty.get() / ((endHour-startHour) * 60) * lOffsetY) );
+					int lOffsetY = ((lNow.getHour()-getStartHour()) * 60) + lNow.getMinute();
+					nowLine.setY(NodeUtil.snapXY(layoutHelp.dayHeightProperty.get() / ((getEndHour()-getStartHour()) * 60) * lOffsetY) );
 					if (nowLine.widthProperty().isBound() == false) {
 						nowLine.widthProperty().bind(layoutHelp.dayWidthProperty);	
 					}
@@ -596,12 +599,13 @@ implements AgendaSkin
 		// hour height
 		double lScrollbarSize = new ScrollBar().getWidth();
 		layoutHelp.hourHeighProperty.set( layoutHelp.textHeightProperty.get() * 2 + 10 ); // 10 is padding
-		if (weekScrollPane.viewportBoundsProperty().get() != null && (weekScrollPane.viewportBoundsProperty().get().getHeight() - lScrollbarSize) > layoutHelp.hourHeighProperty.get() * (endHour-startHour)) {
+        final int hoursPerDay = getEndHour() - getStartHour();
+        if (weekScrollPane.viewportBoundsProperty().get() != null && (weekScrollPane.viewportBoundsProperty().get().getHeight() - lScrollbarSize) > layoutHelp.hourHeighProperty.get() * hoursPerDay) {
 			// if there is more room than absolutely required, let the height grow with the available room
-			layoutHelp.hourHeighProperty.set( (weekScrollPane.viewportBoundsProperty().get().getHeight() - lScrollbarSize) / (endHour-startHour) );
+			layoutHelp.hourHeighProperty.set( (weekScrollPane.viewportBoundsProperty().get().getHeight() - lScrollbarSize) / hoursPerDay);
 		}
 	}
-	private LayoutHelp layoutHelp = new LayoutHelp(getSkinnable(), this, startHour, endHour);
+	private LayoutHelp layoutHelp = new LayoutHelp(getSkinnable(), this, getStartHour(), getEndHour());
 	
 	
 

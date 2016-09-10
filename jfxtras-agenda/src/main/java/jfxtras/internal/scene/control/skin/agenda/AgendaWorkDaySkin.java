@@ -29,22 +29,23 @@
 
 package jfxtras.internal.scene.control.skin.agenda;
 
+import jfxtras.internal.scene.control.skin.agenda.base24hour.AgendaSkinTimeScale24HourAbstract;
+import jfxtras.internal.scene.control.skin.agenda.base24hour.AgendaSkinTimeScaleWorkDayAbstract;
+import jfxtras.scene.control.agenda.Agenda;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import jfxtras.internal.scene.control.skin.agenda.base24hour.AgendaSkinTimeScale24HourAbstract;
-import jfxtras.scene.control.agenda.Agenda;
-
 /**
  * @author Tom Eugelink
  */
-public class AgendaDaySkin extends AgendaSkinTimeScale24HourAbstract<AgendaDaySkin> {
-	
+public class AgendaWorkDaySkin extends AgendaSkinTimeScaleWorkDayAbstract<AgendaWorkDaySkin> {
+
 	/**
-	 * 
+	 *
 	 */
-	public AgendaDaySkin(Agenda control) {
+	public AgendaWorkDaySkin(Agenda control) {
 		super(control);
 	}
 
