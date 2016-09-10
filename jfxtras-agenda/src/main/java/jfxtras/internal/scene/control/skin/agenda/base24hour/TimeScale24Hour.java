@@ -38,6 +38,10 @@ import jfxtras.util.NodeUtil;
 class TimeScale24Hour extends Pane {
 
 	TimeScale24Hour(Pane pane, LayoutHelp layoutHelp) {
+		this(pane, layoutHelp, 0, 24);
+	}
+
+	TimeScale24Hour(Pane pane, LayoutHelp layoutHelp, int startHour, int endHour) {
 		this.pane = pane;
 		this.layoutHelp = layoutHelp;
 		
@@ -51,23 +55,23 @@ class TimeScale24Hour extends Pane {
 		setMouseTransparent(true);
 		
 		// add contents
-		addTimeScale();
+		addTimeScale(startHour, endHour);
 	}
 	final Pane pane;
 	final LayoutHelp layoutHelp;
 	
-	private void addTimeScale() {
+	private void addTimeScale(int startHour, int endHour) {
 		
 		// draw hours
-		for (int lHour = 0; lHour < 24; lHour++)
+		for (int lHour = startHour; lHour < endHour; lHour++)
 		{
-			// hour line
+			// hour lines
 			{
 				Line l = new Line(0,10,100,10);
 				l.setId("hourLine" + lHour);
 				l.getStyleClass().add("HourLine");
 				l.startXProperty().set(0.0);
-				l.startYProperty().bind( NodeUtil.snapXY(layoutHelp.hourHeighProperty.multiply(lHour)) );
+				l.startYProperty().bind( NodeUtil.snapXY(layoutHelp.hourHeighProperty.multiply(lHour-startHour)) );
 				l.endXProperty().bind( NodeUtil.snapXY(pane.widthProperty()));
 				l.endYProperty().bind( NodeUtil.snapXY(l.startYProperty()));
 				getChildren().add(l);
@@ -79,7 +83,7 @@ class TimeScale24Hour extends Pane {
 				l.getStyleClass().add("HalfHourLine");
 				l.startXProperty().bind( NodeUtil.snapXY(layoutHelp.timeWidthProperty));
 				l.endXProperty().bind( NodeUtil.snapXY(pane.widthProperty()));
-				l.startYProperty().bind( NodeUtil.snapXY(layoutHelp.hourHeighProperty.multiply(lHour + 0.5)));
+				l.startYProperty().bind( NodeUtil.snapXY(layoutHelp.hourHeighProperty.multiply((lHour-startHour) + 0.5)));
 				l.endYProperty().bind( NodeUtil.snapXY(l.startYProperty()));
 				getChildren().add(l);
 			}
@@ -87,7 +91,7 @@ class TimeScale24Hour extends Pane {
 			{
 				Text t = new Text(lHour + ":00");
 				t.xProperty().bind(layoutHelp.timeWidthProperty.subtract(t.getBoundsInParent().getWidth()).subtract(layoutHelp.timeColumnWhitespaceProperty.get() / 2));
-				t.yProperty().bind(layoutHelp.hourHeighProperty.multiply(lHour));
+				t.yProperty().bind(layoutHelp.hourHeighProperty.multiply(lHour-startHour));
 				t.setTranslateY(t.getBoundsInParent().getHeight()); // move it under the line
 				t.getStyleClass().add("HourLabel");
 				t.setFontSmoothingType(FontSmoothingType.LCD);

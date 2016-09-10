@@ -83,7 +83,10 @@ implements AgendaSkin
 {
 	// ==================================================================================================================
 	// CONSTRUCTOR
-	
+
+	private int startHour = 0;
+	private int endHour = 24;
+
 	/**
 	 * 
 	 */
@@ -94,6 +97,11 @@ implements AgendaSkin
 		construct();
 	}
 	protected final Agenda control;
+
+	public void setHourBoundary(int startHour, int endHour) {
+		this.startHour = startHour;
+		reconstruct();
+	}
 
 	/**
 	 * Reconstruct the UI part
@@ -375,11 +383,11 @@ implements AgendaSkin
 	private void scrollWeekpaneToShowDisplayedTime() {
 		// calculate the offset of the displayed time from midnight
 		LocalDateTime lDisplayedLocalDateTime = getSkinnable().displayedLocalDateTime().get();
-		double lOffsetInMinutes = (lDisplayedLocalDateTime.getHour() * 60) + lDisplayedLocalDateTime.getMinute();
+		double lOffsetInMinutes = ((lDisplayedLocalDateTime.getHour()-startHour) * 60) + lDisplayedLocalDateTime.getMinute();
 		
 		// calculate the position of the scrollbar that matches that offset from midnight
 		double lScrollRange = weekScrollPane.getVmax() - weekScrollPane.getVmin();
-		double lValue = lScrollRange * lOffsetInMinutes / (24.0 * 60.0);
+		double lValue = lScrollRange * lOffsetInMinutes / ((endHour-startHour) * 60.0);
 		weekScrollPane.setVvalue(lValue);
 	}
 	
@@ -440,7 +448,7 @@ implements AgendaSkin
 		}
 		
 		private void construct() {
-			getChildren().add(new TimeScale24Hour(this, layoutHelp));
+			getChildren().add(new TimeScale24Hour(this, layoutHelp, startHour, endHour));
 			
 			int i = 0;
 			for (LocalDate localDate : determineDisplayedLocalDates())
@@ -451,7 +459,8 @@ implements AgendaSkin
 				lDayPane.prefWidthProperty().bind(layoutHelp.dayWidthProperty);
 				lDayPane.prefHeightProperty().bind(layoutHelp.dayHeightProperty);
 				getChildren().add(lDayPane);
-				
+				lDayPane.setStartHour(startHour);
+				lDayPane.setEndHour(endHour);
 				// remember
 				dayBodyPanes.add(lDayPane);
 				localDate = localDate.plusDays(1);
@@ -514,8 +523,8 @@ implements AgendaSkin
 					}
 
 					// place it
-					int lOffsetY = (lNow.getHour() * 60) + lNow.getMinute();
-					nowLine.setY(NodeUtil.snapXY(layoutHelp.dayHeightProperty.get() / (24 * 60) * lOffsetY) );
+					int lOffsetY = ((lNow.getHour()-startHour) * 60) + lNow.getMinute();
+					nowLine.setY(NodeUtil.snapXY(layoutHelp.dayHeightProperty.get() / ((endHour-startHour) * 60) * lOffsetY) );
 					if (nowLine.widthProperty().isBound() == false) {
 						nowLine.widthProperty().bind(layoutHelp.dayWidthProperty);	
 					}
@@ -587,12 +596,12 @@ implements AgendaSkin
 		// hour height
 		double lScrollbarSize = new ScrollBar().getWidth();
 		layoutHelp.hourHeighProperty.set( layoutHelp.textHeightProperty.get() * 2 + 10 ); // 10 is padding
-		if (weekScrollPane.viewportBoundsProperty().get() != null && (weekScrollPane.viewportBoundsProperty().get().getHeight() - lScrollbarSize) > layoutHelp.hourHeighProperty.get() * 24) {
+		if (weekScrollPane.viewportBoundsProperty().get() != null && (weekScrollPane.viewportBoundsProperty().get().getHeight() - lScrollbarSize) > layoutHelp.hourHeighProperty.get() * (endHour-startHour)) {
 			// if there is more room than absolutely required, let the height grow with the available room
-			layoutHelp.hourHeighProperty.set( (weekScrollPane.viewportBoundsProperty().get().getHeight() - lScrollbarSize) / 24 );
+			layoutHelp.hourHeighProperty.set( (weekScrollPane.viewportBoundsProperty().get().getHeight() - lScrollbarSize) / (endHour-startHour) );
 		}
 	}
-	private LayoutHelp layoutHelp = new LayoutHelp(getSkinnable(), this);
+	private LayoutHelp layoutHelp = new LayoutHelp(getSkinnable(), this, startHour, endHour);
 	
 	
 

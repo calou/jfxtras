@@ -53,6 +53,10 @@ import jfxtras.util.NodeUtil;
  */
 class DayBodyPane extends Pane
 {
+
+	private int startHour = 8;
+	private int endHour = 21;
+
 	/**
 	 * 
 	 */
@@ -65,7 +69,15 @@ class DayBodyPane extends Pane
 	final ObjectProperty<LocalDate> localDateObjectProperty = new SimpleObjectProperty<LocalDate>(this, "localDate");
 	final AllAppointments allAppointments;
 	final LayoutHelp layoutHelp;
-	
+
+	public void setStartHour(int startHour) {
+		this.startHour = startHour;
+	}
+
+	public void setEndHour(int endHour) {
+		this.endHour = endHour;
+	}
+
 	/**
 	 * 
 	 */
@@ -199,7 +211,7 @@ class DayBodyPane extends Pane
 		double lAllFlagpolesWidth = layoutHelp.wholedayAppointmentFlagpoleWidthProperty.get() * lWholedayCnt;
 		double lDayWidth = layoutHelp.dayContentWidthProperty.get();
 		double lRemainingWidthForAppointments = lDayWidth - lAllFlagpolesWidth;
-		double lNumberOfPixelsPerMinute = layoutHelp.dayHeightProperty.get() / (24 * 60);
+		double lNumberOfPixelsPerMinute = layoutHelp.dayHeightProperty.get() / ((endHour-startHour) * 60);
 		
 		// then add all tracked appointments (regular & task) to the day
 		for (AppointmentAbstractTrackedPane lAppointmentAbstractTrackedPane : trackedAppointmentBodyPanes) {
@@ -214,7 +226,7 @@ class DayBodyPane extends Pane
 			lAppointmentAbstractTrackedPane.setLayoutX( NodeUtil.snapXY(lX));
 			
 			// the Y is determined by the start time in minutes projected onto the total day height (being 24 hours)
-			int lStartOffsetInMinutes = (lAppointmentAbstractTrackedPane.startDateTime.getHour() * 60) + lAppointmentAbstractTrackedPane.startDateTime.getMinute();
+			int lStartOffsetInMinutes = ((lAppointmentAbstractTrackedPane.startDateTime.getHour()-startHour) * 60) + lAppointmentAbstractTrackedPane.startDateTime.getMinute();
 			double lY = lNumberOfPixelsPerMinute * lStartOffsetInMinutes;
 			lAppointmentAbstractTrackedPane.setLayoutY( NodeUtil.snapXY(lY) );
 			
@@ -232,7 +244,7 @@ class DayBodyPane extends Pane
 				lH = 5; // task height
 			}
 			else {
-				long lHeightInMinutes = lAppointmentAbstractTrackedPane.durationInMS / 1000 / 60;
+				long 	lHeightInMinutes = lAppointmentAbstractTrackedPane.durationInMS / 1000 / 60;
 				lH = lNumberOfPixelsPerMinute * lHeightInMinutes;
 
 				// the height has a minimum size, in order to be able to render sensibly
