@@ -98,7 +98,7 @@ implements AgendaSkin
 	}
 	protected final Agenda control;
 
-	public void setHourBoundary(int startHour, int endHour) {
+	public void setHourBoundaries(int startHour, int endHour) {
 		this.startHour = startHour;
 		reconstruct();
 	}
