@@ -73,49 +73,46 @@ class DurationDragger extends Rectangle
 		// start resize
 		setOnMousePressed( (mouseEvent) -> {
 			// only on primary
-			if (mouseEvent.getButton().equals(MouseButton.PRIMARY) == false) {
-				return;
-			}
+			if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+				// we handle this event
+				mouseEvent.consume();
 
-			// we handle this event
-			mouseEvent.consume();
-			
-			// place a rectangle at exactly the same location as the appointmentPane
-			setCursor(Cursor.V_RESIZE);
-			resizeRectangle = new Rectangle(appointmentPane.getLayoutX(), appointmentPane.getLayoutY(), appointmentPane.getWidth(), appointmentPane.getHeight()); // the values are already snapped
-			resizeRectangle.getStyleClass().add("GhostRectangle");
-			((Pane)appointmentPane.getParent()).getChildren().add(resizeRectangle);
-			
-			// place a text node at the bottom of the resize rectangle
-			endTimeText = new Text(layoutHelp.timeDateTimeFormatter.format(appointment.getEndLocalDateTime()));
-			endTimeText.layoutXProperty().set(appointmentPane.getLayoutX()); 
-			endTimeText.layoutYProperty().bind(resizeRectangle.heightProperty().add(appointmentPane.getLayoutY())); 
-			endTimeText.getStyleClass().add("GhostRectangleText");
-			((Pane)appointmentPane.getParent()).getChildren().add(endTimeText);
+				// place a rectangle at exactly the same location as the appointmentPane
+				setCursor(Cursor.V_RESIZE);
+				resizeRectangle = new Rectangle(appointmentPane.getLayoutX(), appointmentPane.getLayoutY(), appointmentPane.getWidth(), appointmentPane.getHeight()); // the values are already snapped
+				resizeRectangle.getStyleClass().add("GhostRectangle");
+				((Pane) appointmentPane.getParent()).getChildren().add(resizeRectangle);
+
+				// place a text node at the bottom of the resize rectangle
+				endTimeText = new Text(layoutHelp.timeDateTimeFormatter.format(appointment.getEndLocalDateTime()));
+				endTimeText.layoutXProperty().set(appointmentPane.getLayoutX());
+				endTimeText.layoutYProperty().bind(resizeRectangle.heightProperty().add(appointmentPane.getLayoutY()));
+				endTimeText.getStyleClass().add("GhostRectangleText");
+				((Pane) appointmentPane.getParent()).getChildren().add(endTimeText);
+			}
 		});
 		
 		// visualize resize
 		setOnMouseDragged( (mouseEvent) -> {
 			// only on primary
-			if (mouseEvent.getButton().equals(MouseButton.PRIMARY) == false) {
-				return;
-			}
+			if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
 
-			// we handle this event
-			mouseEvent.consume();
-			
-			//  calculate the number of pixels from on-screen nodeY (layoutY) to on-screen mouseY					
-			double lNodeScreenY = NodeUtil.screenY(appointmentPane);
-			double lMouseY = mouseEvent.getScreenY();
-			double lHeight = lMouseY - lNodeScreenY;
-			if (lHeight < minimumHeight) {
-				lHeight = minimumHeight; // prevent underflow
-			}
-			resizeRectangle.setHeight( NodeUtil.snapWH(resizeRectangle.getLayoutY(), lHeight) );
+				// we handle this event
+				mouseEvent.consume();
 
-			// show the current time in the label
-			LocalDateTime endLocalDateTime = calculateEndDateTime();
-			endTimeText.setText(layoutHelp.timeDateTimeFormatter.format(endLocalDateTime));
+				//  calculate the number of pixels from on-screen nodeY (layoutY) to on-screen mouseY
+				double lNodeScreenY = NodeUtil.screenY(appointmentPane);
+				double lMouseY = mouseEvent.getScreenY();
+				double lHeight = lMouseY - lNodeScreenY;
+				if (lHeight < minimumHeight) {
+					lHeight = minimumHeight; // prevent underflow
+				}
+				resizeRectangle.setHeight(NodeUtil.snapWH(resizeRectangle.getLayoutY(), lHeight));
+
+				// show the current time in the label
+				LocalDateTime endLocalDateTime = calculateEndDateTime();
+				endTimeText.setText(layoutHelp.timeDateTimeFormatter.format(endLocalDateTime));
+			}
 		});
 		
 		// end resize
@@ -151,7 +148,7 @@ class DurationDragger extends Rectangle
 	private LocalDateTime calculateEndDateTime() {
 		
 		// calculate the new end datetime for the appointment (recalculating the duration)
-		int ms = (int)(resizeRectangle.getHeight() * layoutHelp.durationInMSPerPixelProperty.get());
+		int ms = (int)(resizeRectangle.getHeight()* (layoutHelp.getHoursPerDayRatio()) * layoutHelp.durationInMSPerPixelProperty.get());
 		LocalDateTime endLocalDateTime = appointmentPane.startDateTime.plusSeconds(ms / 1000);					
 		
 		// round to X minutes accuracy

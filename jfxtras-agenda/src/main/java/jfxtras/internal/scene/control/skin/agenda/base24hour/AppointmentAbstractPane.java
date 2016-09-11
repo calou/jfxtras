@@ -47,7 +47,7 @@ import jfxtras.scene.control.agenda.Agenda;
 import jfxtras.scene.control.agenda.Agenda.Appointment;
 import jfxtras.util.NodeUtil;
 
-abstract class AppointmentAbstractPane extends Pane {
+abstract class 	AppointmentAbstractPane extends Pane {
 
 	/**
 	 * @param calendar

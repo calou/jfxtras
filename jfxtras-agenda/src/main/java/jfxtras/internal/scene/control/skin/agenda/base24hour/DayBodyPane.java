@@ -174,7 +174,7 @@ class DayBodyPane extends Pane
 			}
 			
 			// calculate the starttime
-			LocalDateTime lStartDateTime = localDateObjectProperty.get().atStartOfDay();
+			LocalDateTime lStartDateTime = localDateObjectProperty.get().atStartOfDay().plusHours(startHour);
 			lStartDateTime = lStartDateTime.plusSeconds( (int)(resizeRectangle.getY() * layoutHelp.durationInMSPerPixelProperty.get() / 1000) );
 			lStartDateTime = layoutHelp.roundTimeToNearestMinutes(lStartDateTime, (int)((AgendaSkinTimeScale24HourAbstract<?>)layoutHelp.skin).getSnapToMinutes());
 			

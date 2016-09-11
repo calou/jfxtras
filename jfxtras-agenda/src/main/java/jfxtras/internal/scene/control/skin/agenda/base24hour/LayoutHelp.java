@@ -49,7 +49,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import jfxtras.internal.scene.control.skin.agenda.AgendaSkin;
-import jfxtras.internal.scene.control.skin.agenda.base24hour.AppointmentAbstractPane.AppointmentForDrag;
 import jfxtras.scene.control.agenda.Agenda;
 import jfxtras.scene.control.agenda.Agenda.Appointment;
 
@@ -59,8 +58,17 @@ import jfxtras.scene.control.agenda.Agenda.Appointment;
  */
 class LayoutHelp {
 
+	private int startHour;
+	private int endHour;
+	private int hoursPerDay;
+	private double hoursPerDayRatio;
+
 	public LayoutHelp(Agenda skinnable, AgendaSkin skin, int startHour, int endHour) {
-		this.msPerDayProperty = new SimpleDoubleProperty((endHour-startHour) * 60 * 60 * 1000);
+		this.startHour = startHour;
+		this.endHour = endHour;
+		this.hoursPerDay = endHour-startHour;
+		this.hoursPerDayRatio = (1.0 * hoursPerDay)/24.0;
+		this.msPerDayProperty = new SimpleDoubleProperty(this.hoursPerDay * 60 * 60 * 1000);
 		this.skinnable = skinnable;
 		this.skin = skin;
 		dragPane = new DragPane(this);
@@ -75,7 +83,7 @@ class LayoutHelp {
 		dayContentWidthProperty.bind( dayWidthProperty.subtract(10) ); // the 10 is a margin at the right so that there is always room to start a new appointment
 		
 		// hour height
-		dayHeightProperty.bind(hourHeighProperty.multiply(endHour-startHour));
+		dayHeightProperty.bind(hourHeighProperty.multiply(this.hoursPerDay));
 		durationInMSPerPixelProperty.bind( msPerDayProperty.divide(dayHeightProperty) );
 		
 		// generic
@@ -183,4 +191,19 @@ class LayoutHelp {
 		}
 	}
 
+	public int getStartHour() {
+		return startHour;
+	}
+
+	public int getEndHour() {
+		return endHour;
+	}
+
+	public int getHoursPerDay() {
+		return hoursPerDay;
+	}
+
+	public double getHoursPerDayRatio() {
+		return hoursPerDayRatio;
+	}
 }

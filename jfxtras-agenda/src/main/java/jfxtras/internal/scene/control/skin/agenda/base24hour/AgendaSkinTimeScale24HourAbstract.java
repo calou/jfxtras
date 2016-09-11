@@ -86,6 +86,7 @@ implements AgendaSkin
 
 	private int startHour = 0;
 	private int endHour = 24;
+	private double hoursPerDayRatio;
 
 	/**
 	 * 
@@ -93,6 +94,7 @@ implements AgendaSkin
     public AgendaSkinTimeScale24HourAbstract(Agenda control)
 	{
         super(control);
+		this.hoursPerDayRatio = (1.0*(getEndHour() -getStartHour()))/24;
 		this.control = control;
 		construct();
 	}
@@ -284,8 +286,8 @@ implements AgendaSkin
 	// TBEERNOT: reattempt converting this to Integer 
     public final ObjectProperty<Double> snapToMinutesProperty() { return snapToMinutesProperty; }
     private ObjectProperty<Double> snapToMinutesProperty = new SimpleStyleableObjectProperty<Double>(StyleableProperties.SNAPTOMINUTES_CSSMETADATA, StyleableProperties.SNAPTOMINUTES_CSSMETADATA.getInitialValue(null));
-    public final void setSnapToMinutes(double value) { snapToMinutesProperty().set(value); }
-    public final double getSnapToMinutes() { return snapToMinutesProperty.get().intValue(); }
+    public final void setSnapToMinutes(double value) { snapToMinutesProperty().set(value*hoursPerDayRatio); }
+    public final double getSnapToMinutes() { return snapToMinutesProperty.get().intValue()*hoursPerDayRatio; }
     public final T withSnapToMinutes(double value) { setSnapToMinutes(value); return (T)this; }
 
     // -------------------------
